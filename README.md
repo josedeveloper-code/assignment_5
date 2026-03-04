@@ -31,7 +31,6 @@ DELETE	/api/menu/:id	Remove an item from the menu	202 Accepted
 Postman Link: https://www.postman.com/jcteamwork/workspace/jose-corril-workspaces/collection/52272780-6e5b4001-a641-4baa-b86b-0d9322dd8291?action=share&source=copy-link&creator=52272780
 
 
-
 ## Getting Started
 1. Clone this repository to your local machine
 2. Navigate to the project directory
