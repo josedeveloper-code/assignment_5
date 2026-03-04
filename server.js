@@ -2,6 +2,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 
+console.log('Build the app of Kitchen API');
 
 // 2. INITIALIZE APP and SET PORT
 const app = express();
@@ -23,7 +24,7 @@ const requestLogger = (req, res, next) => {
 };
 app.use(requestLogger);
 
-// VALIDATION ERROR HANDLER: Comprehensive error handling middleware
+// VALIDATION ERROR HANDLER
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -35,7 +36,7 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
-// 4. DATA (Seamless Integration - All items match validation rules)
+// 4. Kitchen API Recipes DATA
 const menuItems = [
     { id: 1, name: "Classic Burger", description: "Juicy beef patty with fresh toppings", price: 12.99, category: "entree", ingredients: ["beef", "lettuce", "tomato", "cheese"], available: true },
     { id: 2, name: "Chicken Caesar Salad", description: "Crisp romaine lettuce with grilled chicken", price: 11.50, category: "entree", ingredients: ["chicken", "romaine", "parmesan", "croutons"], available: true },
@@ -47,7 +48,7 @@ const menuItems = [
     { id: 8, name: "Fish over Rice", description: "Grilled or fried fish served over white and hot sauces", price: 18.00, category: "entree", ingredients: ["Fry Fish", "Rice", "Shrimp", "lettuces", "white sauces"], available: true }
 ];
 
-// 5. VALIDATION RULES (Includes Sanitization for "Expert" level)
+// 5. VALIDATION RULES
 const menuValidation = [
     body('name').trim().isString().isLength({ min: 3 }).escape().withMessage('Name must be at least 3 characters'),
     body('description').trim().isString().isLength({ min: 10 }).escape().withMessage('Description must be at least 10 characters'),
@@ -57,11 +58,26 @@ const menuValidation = [
     body('available').optional().isBoolean().withMessage('Available must be true or false')
 ];
 
+const validateOrder = [
+    body('item').notEmpty().withMessage('What is the menu for your Order Item is required'),
+    body('quantity').isInt({ min: 1 }).withMessage('Must order at least 1.'),
+];
+
 // 6. ROUTES
 
 // Root Route
 app.get('/', (req, res) => {
     res.send('<h1>Server is working!</h1><p>Navigate to <b>/api/menu</b> to see the data.</p>');
+});
+
+// Order Route
+app.post('/order', validateOrder, (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const { item, quantity } = req.body;
+    res.send(`Order received for ${quantity} ${item}(s).`);
 });
 
 // GET: All menu items
@@ -77,7 +93,7 @@ app.get('/api/menu/:id', (req, res) => {
     res.status(200).json(item);
 });
 
-// POST: Add new item (Auto-increments ID)
+// POST: Add new item (201 Created)
 app.post('/api/menu', menuValidation, handleValidationErrors, (req, res) => {
     const newItem = {
         id: menuItems.length > 0 ? Math.max(...menuItems.map(i => i.id)) + 1 : 1,
@@ -85,7 +101,10 @@ app.post('/api/menu', menuValidation, handleValidationErrors, (req, res) => {
         available: req.body.available !== undefined ? req.body.available : true
     };
     menuItems.push(newItem);
-    res.status(201).json(newItem);
+    res.status(201).json({
+        message: "New menu item has been created",
+        "new menu update": newItem
+    });
 });
 
 // PUT: Update an item
@@ -98,17 +117,17 @@ app.put('/api/menu/:id', menuValidation, handleValidationErrors, (req, res) => {
     res.status(200).json(menuItems[index]);
 });
 
-// DELETE: Remove an item
+// DELETE: Remove an item (202 Accepted)
 app.delete('/api/menu/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
     const index = menuItems.findIndex(i => i.id === id);
     if (index === -1) return res.status(404).json({ error: 'Menu item not found' });
 
     menuItems.splice(index, 1);
-    res.status(200).json({ message: "Successfully deleted" });
+    res.status(202).json({ message: "Successfully deleted" });
 });
 
-// 404 CATCH-ALL (Demonstrates deep understanding of middleware flow)
+// 404 CATCH-ALL
 app.use((req, res) => {
     res.status(404).json({ error: "Route not found", path: req.originalUrl });
 });
@@ -121,6 +140,5 @@ app.use((err, req, res, next) => {
 
 // 7. START SERVER
 app.listen(PORT, () => {
-    console.log(`\n Server is running on http://localhost:${PORT}`);
-    console.log(`Try visiting http://localhost:${PORT}/api/menu`);
+    console.log(`\nServer is running on http://localhost:${PORT}`);
 });
