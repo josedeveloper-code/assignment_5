@@ -1,7 +1,34 @@
+# update the clean ReadMe
 # Assignment #5: Restaurant API 
-This repository contains your starter code for the Restaurant API assignment focusing on middleware implementation and API documentation.
+This repository contains your starter code for the Restaurant API assignment focusing on middleware implementation and API documentation. This Repository contains a complete Express.js API for a Kitchen Management System, revising to meet the full requirement featuring full CRUD functionality and custom middleware integration.
 
-# Links: https://github.com/josedeveloper-code/assignment_5/blob/main/server.js 
+Features 
+
+Full CRUD Endpoints: Create, Read, Update, and Delete menu items.
+
+Custom Logging Middleware: Captures every request with a timestamp, method, and URL.
+
+Validation Middleware: Uses express-validator to ensure all "boxes" (request bodies) are filled correctly before reaching the data layer.
+
+Global Error Handling: A catch-all for 404 routes and a 500 internal server error handler.
+
+Understanding the Technology Stack
+Node.js Core Server framwork
+Express-Validator: For schema validation and sanitzation.
+Postman: Used for API documentation and Testing. 
+
+API Endpoints & STATUS Codes
+
+Method	Endpoint	Description	Status Code
+GET	/api/menu	Retrieve all menu items	200 OK
+POST	/api/menu	Create a new menu item	201 Created
+PUT	/api/menu/:id	Update an existing item	200 OK
+DELETE	/api/menu/:id	Remove an item from the menu	202 Accepted
+400 Bad Request /api/menu Retrieved a bad server requested. 
+404 NOT Founded /api/menu a link or update in the file system tells the the computers that those link does not existed nor the update menu does not been found. 
+
+
+
 
 
 ## Getting Started
